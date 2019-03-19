@@ -2,7 +2,7 @@ import os
 import numpy as np
 from config import TEST_DIR, CHAR_DICT
 from cnn.captcha_model import CaptchaCnn
-from cnn.captcha_processing import create_predict_model_data
+from cnn.captcha_processing import create_predict_model_data, create_y_labels
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -19,6 +19,7 @@ def predict_run(p):
     :return:
     """
     x_data = create_predict_model_data(p)
+
     # 模型预测
     model_predict = CAPTCHA_CNN.model_predict(x_data)[0]
     if 1 in set(np.isnan(model_predict).ravel()):
@@ -35,5 +36,7 @@ if __name__ == '__main__':
     file_name_list = os.listdir(TEST_DIR)
     for p in file_name_list:
         if p != '.DS_Store':
-            print(predict_run(p))
+            y_label = create_y_labels(p)
+            y_predict_label = predict_run(p)
+            print('ture label: %s\tpredict label: %s'%(y_label, y_predict_label))
     CAPTCHA_CNN.clear_session()

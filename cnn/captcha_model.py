@@ -105,9 +105,22 @@ class CaptchaCnn(object):
                 if os.path.exists(self.logs) is False:
                     os.mkdir(self.logs)
                 tensor_board = TensorBoard()
-                self.model.fit(x=x_train, y=y_train,
-                               epochs=kwargs['epochs'], batch_size=kwargs['batch_size'],
-                               validation_split=0.1, callbacks=[early_stop, tensor_board])
+                try:
+                    x_train_val = kwargs['x_train_val']
+                    y_train_val = kwargs['y_train_val']
+                    self.H = self.model.fit(x=x_train, y=y_train
+                                            , epochs=kwargs.get('epochs', 10)
+                                            , batch_size=kwargs.get('batch_size', 128)
+                                            , validation_data=(x_train_val, y_train_val)
+                                            , callbacks=[early_stop, tensor_board]
+                                            )
+                except:
+                    self.H = self.model.fit(x=x_train, y=y_train
+                                            , epochs=kwargs['epochs']
+                                            , batch_size=kwargs['batch_size']
+                                            , validation_split=0.1
+                                            , callbacks=[early_stop, tensor_board]
+                                            )
         except Exception as e:
             raise Exception("[fit_model]" + str(e))
 
@@ -131,10 +144,10 @@ class CaptchaCnn(object):
         """
         try:
             self.model = load_model(self.path + self.model_file + ".h5")
-            print("="*20)
+            print("=" * 20)
             print("The model is loaded!")
             print("good luck!")
-            print("="*20)
+            print("=" * 20)
         except Exception as e:
             print("[model_load]" + str(e))
 
@@ -149,10 +162,10 @@ class CaptchaCnn(object):
             model_evaluate = self.model.evaluate(x_test, y_test)
             loss = model_evaluate[0]
             acc = model_evaluate[1]
-            print("-"*20)
+            print("-" * 20)
             print("|loss: |", loss, " |")
             print("|acc: |", acc, " |")
-            print("-"*20)
+            print("-" * 20)
         except Exception as e:
             print("[model_eval]" + str(e))
 
@@ -197,8 +210,8 @@ class CaptchaCnn(object):
         plt.xlabel("Epoch #")
         plt.ylabel("Accuracy")
         plt.legend()
-
-        plt.savefig("loss_acc.png")
+        fn = kwargs.get('file_name', '')
+        plt.savefig(fn + "loss_acc.png")
 
     @staticmethod
     def clear_session():
