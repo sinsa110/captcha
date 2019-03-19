@@ -5,6 +5,9 @@ from keras.models import Model, load_model
 from keras.layers import Dense, Input, Conv2D, Reshape
 from keras.layers import MaxPooling2D, Flatten, Dropout
 from keras.callbacks import EarlyStopping, TensorBoard
+from keras.utils import plot_model
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class CaptchaCnn(object):
@@ -163,6 +166,39 @@ class CaptchaCnn(object):
             return self.model.predict(x_data)
         except Exception as e:
             print("[model_predict]" + str(e))
+
+    def plot_model(self):
+        """ 模型可视化：保存模型结构为图片
+        :return:
+        """
+        plot_model(self.model, to_file='model.png', show_shapes=True)
+
+    def plot_loss_acc(self, **kwargs):
+        """ 训练历史可视化：绘制训练集&验证集上的准确率值和损失值
+        :param kwargs:
+        :return:
+        """
+        N = np.arange(0, kwargs['epoch'])
+        H = self.H
+
+        plt.style.use("ggplot")
+        plt.figure()
+
+        plt.subplot(211)
+        plt.title("Training Loss and Accuracy ")
+        plt.plot(N, H.history["loss"], label="train_loss")
+        plt.plot(N, H.history["val_loss"], label="val_loss")
+        plt.ylabel("Loss")
+        plt.legend()
+
+        plt.subplot(212)
+        plt.plot(N, H.history["acc"], label="train_acc")
+        plt.plot(N, H.history["val_acc"], label="val_acc")
+        plt.xlabel("Epoch #")
+        plt.ylabel("Accuracy")
+        plt.legend()
+
+        plt.savefig("loss_acc.png")
 
     @staticmethod
     def clear_session():
