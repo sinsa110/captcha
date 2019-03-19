@@ -4,6 +4,7 @@ from config import TRAIN_DIR
 from config import IMAGES_H, IMAGES_W, CHANNEL, N_CLASS, N_CHAR
 from config import LOSS, OPTIMIZER, METRICS, KEEP_PROB
 from config import FILTERS_1, FILTERS_2, FILTERS_3, FILTERS_4
+from config import EPOCH, BATCH_SIZE, PATIENCE
 from cnn.captcha_processing import create_train_model_data
 from cnn.captcha_model import CaptchaCnn
 
@@ -42,14 +43,19 @@ def train_run():
             filters_3=FILTERS_3,
             filters_4=FILTERS_4
         )
+        # 绘制模型结构图 model.png
+        captcha_cnn.plot_model()
         # 训练模型
         captcha_cnn.fit_model(
             x_images,
             y_labels,
-            epochs=1,
-            batch_size=128,
-            patience=10
+            epochs=EPOCH,
+            batch_size=BATCH_SIZE,
+            patience=PATIENCE
         )
+        # 绘制训练历史 loss_acc.png
+        captcha_cnn.plot_loss_acc(epoch=EPOCH)
+
         # 模型保存
         captcha_cnn.model_save()
         # 清理session
